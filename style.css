@@ -274,6 +274,128 @@ html, body {
 }
 
 /* ================================================
+   TELA DO VERSÍCULO — etapa intermediária
+   Exibida após abertura do envelope, antes do convite
+   ================================================ */
+#verse-screen {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  background: linear-gradient(160deg, #fff8fb 0%, #fdeef5 55%, #ffffff 100%);
+  align-items: center;
+  justify-content: center;
+  padding: 40px 24px;
+  opacity: 0;
+  transition: opacity 0.6s ease;
+}
+
+#verse-screen.visible {
+  display: flex;
+  animation: verseIn 0.7s ease forwards;
+}
+
+#verse-screen.hide {
+  animation: verseFade 0.5s ease forwards;
+}
+
+@keyframes verseIn {
+  from { opacity: 0; transform: translateY(18px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes verseFade {
+  from { opacity: 1; }
+  to   { opacity: 0; }
+}
+
+#verse-box {
+  max-width: 560px;
+  width: 100%;
+  text-align: center;
+  padding: 56px 48px 48px;
+  background: #ffffff;
+  border-radius: 4px;
+  border: 1.5px solid transparent;
+  background-image:
+    linear-gradient(#ffffff, #ffffff),
+    linear-gradient(135deg,
+      rgba(212,175,55,0.0)   0%,
+      rgba(212,175,55,0.75) 25%,
+      rgba(255,223,100,0.90) 50%,
+      rgba(212,175,55,0.75) 75%,
+      rgba(212,175,55,0.0)  100%
+    );
+  background-origin: border-box;
+  background-clip: padding-box, border-box;
+  box-shadow:
+    0 20px 60px -15px rgba(140,10,80,0.20),
+    0 0 0 1.5px rgba(212,175,55,0.45),
+    inset 0 0 0 1px rgba(212,175,55,0.25);
+}
+
+#verse-text {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(18px, 3.2vw, 24px);
+  font-style: italic;
+  font-weight: 400;
+  line-height: 1.75;
+  color: #5c1a3a;
+  margin: 0 0 20px;
+  letter-spacing: 0.01em;
+}
+
+#verse-ref {
+  font-family: 'Montserrat', sans-serif;
+  font-size: clamp(11px, 1.8vw, 13px);
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #c4166d;
+  margin: 0 0 36px;
+}
+
+#verse-btn {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: #ffffff;
+  background: linear-gradient(135deg, #c4166d 0%, #8f0f56 100%);
+  border: none;
+  border-radius: 50px;
+  padding: 13px 40px;
+  cursor: pointer;
+  transition: opacity 0.2s ease, transform 0.15s ease;
+}
+
+#verse-btn:hover  { opacity: 0.88; }
+#verse-btn:active { transform: scale(0.97); }
+#verse-btn:focus-visible {
+  outline: 2px solid #c4166d;
+  outline-offset: 3px;
+}
+
+/* Responsividade do versículo */
+@media (max-width: 480px) {
+  #verse-box {
+    padding: 44px 28px 40px;
+  }
+  #verse-text {
+    font-size: 17px;
+    line-height: 1.7;
+  }
+  #verse-ref  { font-size: 11px; margin-bottom: 28px; }
+  #verse-btn  { padding: 11px 32px; font-size: 10px; }
+}
+
+@media (max-width: 360px) {
+  #verse-box  { padding: 36px 20px 32px; }
+  #verse-text { font-size: 15px; }
+}
+
+/* ================================================
    CENA CONVITE
    ================================================ */
 #invite-scene {

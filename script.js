@@ -123,17 +123,31 @@
     // 2. Brilhos saem de dentro do envelope junto com a abertura
     burstSparkles();
 
-    // 3. Exibe cena do convite
+    // 3. Exibe tela do versículo (etapa intermediária antes do convite)
     setTimeout(function () {
       envScene.classList.add('hide');
-      inviteScene.setAttribute('aria-hidden', 'false');
-      inviteScene.classList.add('visible');
 
-      petalField.classList.add('active');
-      dustField.classList.add('active');
-      startPetals();
+      var verseScreen = document.getElementById('verse-screen');
+      verseScreen.setAttribute('aria-hidden', 'false');
+      verseScreen.classList.add('visible');
 
-      animateWriteIn();
+      // Quando o usuário clicar em "Continuar" (ou na própria tela), exibe o convite
+      document.getElementById('verse-btn').addEventListener('click', function showInvite() {
+        verseScreen.classList.add('hide');
+        setTimeout(function () {
+          verseScreen.setAttribute('aria-hidden', 'true');
+          verseScreen.style.display = 'none';
+
+          inviteScene.setAttribute('aria-hidden', 'false');
+          inviteScene.classList.add('visible');
+
+          petalField.classList.add('active');
+          dustField.classList.add('active');
+          startPetals();
+
+          animateWriteIn();
+        }, 500);
+      }, { once: true });
     }, 750);
   }
 
