@@ -45,72 +45,86 @@ html, body {
   inset: 0;
   pointer-events: none;
   z-index: 100;
-  overflow: hidden;
-  display: none; /* activado via JS após abrir */
+  overflow: visible;
+  display: none;
 }
 #petal-field.active { display: block; }
 
+/* =====================================================
+   PÉTALAS — animação CSS pura
+   Cada pétala recebe duração/delay individuais via style.
+   fill-mode: forwards mantém a pétala na posição final
+   até o JS removê-la via animationend.
+   ===================================================== */
 .petal {
-  position: absolute;
-  top: -60px;
+  position: fixed;       /* fixed = independente de qualquer overflow do pai */
+  pointer-events: none;
+  transform-origin: center center;
   opacity: 0;
-  will-change: transform, opacity, margin-left;
-  animation-name: fall, sway;
+  will-change: transform, opacity;
+  animation-name: petalFall, petalSway;
   animation-timing-function: linear, ease-in-out;
   animation-iteration-count: 1, infinite;
-  pointer-events: none;
+  animation-fill-mode: forwards, none;
 }
 
-@keyframes fall {
-  0%   { transform: translateY(-5vh) rotate(var(--rot-start, 0deg));  opacity: 0; }
+@keyframes petalFall {
+  0%   {
+    transform: translateY(-60px) rotate(var(--rot-start, 0deg));
+    opacity: 0;
+  }
   5%   { opacity: 0.88; }
-  85%  { opacity: 0.75; }
-  100% { transform: translateY(112vh) rotate(calc(var(--rot-start, 0deg) + 280deg)); opacity: 0; }
+  95%  { opacity: 0.88; }       /* mantém visível quase até o fim */
+  100% {
+    transform: translateY(115vh) rotate(var(--rot-end, 360deg));
+    opacity: 0;                  /* fade nos últimos 5% = aprox. 0.4–0.8s */
+  }
 }
-@keyframes sway {
+
+@keyframes petalSway {
   0%   { margin-left: 0px; }
-  30%  { margin-left: 35px; }
-  65%  { margin-left: -20px; }
-  100% { margin-left: 10px; }
+  25%  { margin-left: var(--sway-max,  30px); }
+  75%  { margin-left: var(--sway-min, -20px); }
+  100% { margin-left: 0px; }
 }
 
 /* ================================================
-   PÓ DECORATIVO — mesmo container/timing das pétalas
+   PÓ DECORATIVO
    ================================================ */
 #dust-field {
   position: fixed;
   inset: 0;
   pointer-events: none;
-  z-index: 99; /* logo abaixo das pétalas */
-  overflow: hidden;
+  z-index: 99;
+  overflow: visible;
   display: none;
 }
 #dust-field.active { display: block; }
 
 .dust-particle {
-  position: absolute;
-  top: -20px;
+  position: fixed;
+  pointer-events: none;
+  transform-origin: center center;
   opacity: 0;
-  will-change: transform, opacity, margin-left;
-  animation-name: dust-fall, dust-sway;
+  will-change: transform, opacity;
+  animation-name: dustFall, petalSway;
   animation-timing-function: linear, ease-in-out;
   animation-iteration-count: 1, infinite;
-  pointer-events: none;
+  animation-fill-mode: forwards, none;
 }
 
-@keyframes dust-fall {
-  0%   { transform: translateY(-3vh) rotate(var(--rot-start, 0deg)); opacity: 0; }
+@keyframes dustFall {
+  0%   {
+    transform: translateY(-20px) rotate(var(--rot-start, 0deg));
+    opacity: 0;
+  }
   8%   { opacity: 0.90; }
-  80%  { opacity: 0.60; }
-  100% { transform: translateY(112vh) rotate(calc(var(--rot-start, 0deg) + 420deg)); opacity: 0; }
+  92%  { opacity: 0.90; }
+  100% {
+    transform: translateY(115vh) rotate(var(--rot-end, 420deg));
+    opacity: 0;
+  }
 }
-@keyframes dust-sway {
-  0%   { margin-left: 0px; }
-  25%  { margin-left: 18px; }
-  60%  { margin-left: -12px; }
-  100% { margin-left: 6px; }
-}
-
 /* ================================================
    CENA ENVELOPE
    ================================================ */
@@ -252,11 +266,6 @@ html, body {
 }
 #env-monogram span { color: var(--fuchsia-pale); }
 
-/* Convite saindo do envelope */
-#envelope.opening .invite-inside {
-  animation: cardRise .9s cubic-bezier(.2,.8,.2,1) .3s forwards;
-}
-
 /* Canvas de brilhos saindo do envelope ao abrir — cobre toda a cena do envelope */
 #env-sparkles {
   position: absolute;
@@ -288,6 +297,7 @@ html, body {
   padding: 40px 24px;
   opacity: 0;
   transition: opacity 0.6s ease;
+  overflow-y: auto;
 }
 
 #verse-screen.visible {
@@ -468,24 +478,7 @@ html, body {
 /* Canto superior esquerdo */
 
 
-/* Canto inferior direito — imagem já espelhada, sem transform */
 
-
-/* Lateral esquerda — botõezinhos do meio */
-
-
-/* Lateral direita — imagem já espelhada */
-
-
-
-
-
-/* ================================================
-   MOLDURA FLORAL — background-image do cartão
-   Proporção exata da imagem: 365x508
-   ================================================ */
-.invite-card {
-}
 
 /* Todo conteúdo fica acima da moldura (background não afeta z-index, mas garantir) */
 .invite-card > *:not(style) {
@@ -1119,10 +1112,4 @@ html, body {
   background:
     url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 220 220'%3E%3Cg transform='translate(42 55)' opacity='0.13'%3E%3Cpath d='M0,-18 C6,-29 29,-29 29,-11 C29,3 16,16 0,29 C-16,16 -29,3 -29,-11 C-29,-29 -6,-29 0,-18Z' fill='%23d6197e'/%3E%3C/g%3E%3Cg transform='translate(162 145)' opacity='0.11'%3E%3Cpath d='M0,-18 C6,-29 29,-29 29,-11 C29,3 16,16 0,29 C-16,16 -29,3 -29,-11 C-29,-29 -6,-29 0,-18Z' fill='%230d1b5e'/%3E%3C/g%3E%3Cg transform='translate(185 30) rotate(15)' opacity='0.09'%3E%3Cpath d='M0,-12 C4,-19 19,-19 19,-7 C19,1 11,11 0,19 C-11,11 -19,1 -19,-7 C-19,-19 -4,-19 0,-12Z' fill='%23d6197e'/%3E%3C/g%3E%3Cg transform='translate(28 190) rotate(-15)' opacity='0.09'%3E%3Cpath d='M0,-12 C4,-19 19,-19 19,-7 C19,1 11,11 0,19 C-11,11 -19,1 -19,-7 C-19,-19 -4,-19 0,-12Z' fill='%230d1b5e'/%3E%3C/g%3E%3C/svg%3E") 0 0 / 220px 220px repeat,
     linear-gradient(160deg,#fff8fb 0%,#fdeef5 50%,#ffffff 100%);
-}
-
-/* Remove os pseudo-elementos (nao funcionais aqui) */
-#invite-scene::before,
-#invite-scene::after {
-  display: none;
 }

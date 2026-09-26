@@ -259,34 +259,59 @@
   ];
 
   function spawnPetal() {
-    if (reduceMotion || !petalField.classList.contains('active')) return;
+    if (reduceMotion) return;
 
     var shapeIdx = Math.floor(Math.random() * petalShapes.length);
     var colorIdx = Math.floor(Math.random() * petalColors.length);
     var colors   = petalColors[colorIdx];
-
-    var svgStr = petalShapes[shapeIdx](colors[0], colors[1], colors[2]);
+    var svgStr   = petalShapes[shapeIdx](colors[0], colors[1], colors[2]);
 
     var p = document.createElement('div');
     p.className = 'petal';
 
-    var size     = 18 + Math.random() * 18;   // 18–36px — maior e mais visível
-    var startX   = Math.random() * 100;
-    var fallDur  = 8  + Math.random() * 8;    // 8–16s — cai devagar
-    var swayDur  = 3  + Math.random() * 3;
-    var delay    = Math.random() * 0.8;
-    var rotStart = Math.random() * 360;
+    // Dimensões
+    var size    = 18 + Math.random() * 18;  // 18–36 px
+    // Posição horizontal aleatória na viewport
+    var leftPct = Math.random() * 96;       // 0–96 vw (deixa margem para a largura)
+    // Duração da queda: 8 a 16 segundos
+    var fallDur = 8 + Math.random() * 8;
+    // Período do balanço: 2.5 a 5s
+    var swayDur = 2.5 + Math.random() * 2.5;
+    // Rotação inicial e final
+    var rotStart = Math.floor(Math.random() * 360);
+    var rotDelta = 180 + Math.floor(Math.random() * 360); // gira 180–540° durante a queda
+    var rotEnd   = rotStart + rotDelta;
+    // Amplitude do balanço: assimétrico para naturalidade
+    var swayMax  = Math.floor(15 + Math.random() * 30);
+    var swayMin  = -Math.floor(10 + Math.random() * 20);
 
-    p.style.width             = size + 'px';
-    p.style.height            = size * 1.2 + 'px';
-    p.style.left              = startX + 'vw';
+    p.style.width  = size + 'px';
+    p.style.height = size * 1.2 + 'px';
+    p.style.left   = leftPct + 'vw';
+    p.style.top    = '0px';
+
+    // Variáveis CSS para os keyframes
     p.style.setProperty('--rot-start', rotStart + 'deg');
-    p.style.animationDuration = fallDur + 's, ' + swayDur + 's';
-    p.style.animationDelay    = delay + 's, 0s';
-    p.innerHTML               = svgStr;
+    p.style.setProperty('--rot-end',   rotEnd   + 'deg');
+    p.style.setProperty('--sway-max',  swayMax  + 'px');
+    p.style.setProperty('--sway-min',  swayMin  + 'px');
 
+    // Durações individuais — a animação de queda NÃO é compartilhada
+    p.style.animationDuration = fallDur + 's, ' + swayDur + 's';
+    p.style.animationDelay    = '0s, 0s';
+
+    p.innerHTML = svgStr;
     petalField.appendChild(p);
-    setTimeout(function () { p.remove(); }, (fallDur + delay) * 1000 + 400);
+
+    // Remover do DOM somente quando a animação de QUEDA terminar.
+    // O evento 'animationend' dispara para cada animação separadamente;
+    // filtramos pelo nome 'petalFall' para ignorar 'petalSway' (infinita).
+    // Isso garante remoção individual por trajetória — nunca por tempo global.
+    p.addEventListener('animationend', function onFallEnd(e) {
+      if (e.animationName !== 'petalFall') return;
+      p.removeEventListener('animationend', onFallEnd);
+      if (p.parentNode) p.parentNode.removeChild(p);
+    });
   }
 
   // Formas de partícula de pó — delicadas e elegantes
@@ -329,7 +354,7 @@
   ];
 
   function spawnDust() {
-    if (reduceMotion || !dustField.classList.contains('active')) return;
+    if (reduceMotion) return;
 
     var shapeIdx = Math.floor(Math.random() * dustShapes.length);
     var color    = dustColors[Math.floor(Math.random() * dustColors.length)];
@@ -338,59 +363,77 @@
     var d = document.createElement('div');
     d.className = 'dust-particle';
 
-    var size     = 4 + Math.random() * 7;      // 4–11px — bem pequeno
-    var startX   = Math.random() * 100;
-    var fallDur  = 7 + Math.random() * 9;      // 7–16s — cai devagar como as pétalas
+    var size     = 4 + Math.random() * 7;
+    var leftPct  = Math.random() * 98;
+    var fallDur  = 7 + Math.random() * 9;
     var swayDur  = 2 + Math.random() * 3;
-    var delay    = Math.random() * 0.8;
-    var rotStart = Math.random() * 360;
+    var rotStart = Math.floor(Math.random() * 360);
+    var rotEnd   = rotStart + 240 + Math.floor(Math.random() * 360);
+    var swayMax  = Math.floor(10 + Math.random() * 20);
+    var swayMin  = -Math.floor(8  + Math.random() * 16);
 
-    d.style.width             = size + 'px';
-    d.style.height            = size + 'px';
-    d.style.left              = startX + 'vw';
+    d.style.width  = size + 'px';
+    d.style.height = size + 'px';
+    d.style.left   = leftPct + 'vw';
+    d.style.top    = '0px';
+
     d.style.setProperty('--rot-start', rotStart + 'deg');
-    d.style.animationDuration = fallDur + 's, ' + swayDur + 's';
-    d.style.animationDelay    = delay + 's, 0s';
-    d.innerHTML               = svgStr;
+    d.style.setProperty('--rot-end',   rotEnd   + 'deg');
+    d.style.setProperty('--sway-max',  swayMax  + 'px');
+    d.style.setProperty('--sway-min',  swayMin  + 'px');
 
+    d.style.animationDuration = fallDur + 's, ' + swayDur + 's';
+    d.style.animationDelay    = '0s, 0s';
+
+    d.innerHTML = svgStr;
     dustField.appendChild(d);
-    setTimeout(function () { d.remove(); }, (fallDur + delay) * 1000 + 400);
+
+    d.addEventListener('animationend', function onDustEnd(e) {
+      if (e.animationName !== 'dustFall') return;
+      d.removeEventListener('animationend', onDustEnd);
+      if (d.parentNode) d.parentNode.removeChild(d);
+    });
   }
 
   function startPetals() {
-    // Aguarda 3 segundos antes de qualquer pétala aparecer,
-    // depois lança uma rajada e um fluxo contínuo que se encerra
-    // automaticamente ao fim de 3 segundos (total de chuva = 3s).
-    var PETAL_START_DELAY = 3000;  // ms — delay antes das pétalas aparecerem
-    var PETAL_RAIN_DURATION = 8000; // ms — duração total da chuva de pétalas
+    // -------------------------------------------------------
+    // REGRAS:
+    // 1. Aguarda PETAL_START_DELAY antes de criar a primeira pétala.
+    // 2. Durante PETAL_RAIN_DURATION (10s) cria pétalas continuamente.
+    // 3. Após 10s para a criação — as pétalas existentes continuam
+    //    sua animação CSS individualmente até terminarem (animationend).
+    // 4. NÃO existe nenhum controle de remoção global por tempo.
+    // -------------------------------------------------------
+    var PETAL_START_DELAY  = 3000;   // ms — delay antes de começar
+    var PETAL_RAIN_DURATION = 10000; // ms — janela de criação (10s)
 
     setTimeout(function () {
-      // Marca o fim da chuva
-      var rainEnd = Date.now() + PETAL_RAIN_DURATION;
 
-      // Rajada inicial — espaçada dentro da janela de 3s
+      // -- Rajada inicial: 12 pétalas espaçadas nos primeiros 2.5s --
       for (var i = 0; i < 12; i++) {
         (function (idx) {
-          var t = idx * 220;
-          if (t < PETAL_RAIN_DURATION) {
-            setTimeout(spawnPetal, t);
-            setTimeout(spawnDust,  t + 110); // pó levemente defasado — efeito intercalado
-          }
+          setTimeout(function () {
+            spawnPetal();
+            if (idx % 2 === 0) spawnDust();  // pó intercalado
+          }, idx * 210);
         }(i));
       }
 
-      // Fluxo contínuo — para quando a janela de 8s se esgotar
+      // -- Fluxo contínuo a cada 850ms durante os 10s restantes --
+      // O intervalo controla APENAS a criação de novas pétalas.
+      // Cada pétala já criada vive de forma completamente independente.
+      var creationEnd = Date.now() + PETAL_RAIN_DURATION;
+
       var interval = setInterval(function () {
-        if (Date.now() >= rainEnd) {
+        if (Date.now() >= creationEnd) {
+          // Para a criação de novas pétalas — só isso.
           clearInterval(interval);
-          // Remove a classe active para que novas pétalas e pó não sejam criados
-          petalField.classList.remove('active');
-          dustField.classList.remove('active');
           return;
         }
         spawnPetal();
         spawnDust();
       }, 850);
+
     }, PETAL_START_DELAY);
   }
 
