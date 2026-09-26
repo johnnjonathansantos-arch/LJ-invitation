@@ -1,0 +1,1115 @@
+﻿/* ================================================
+   CONVITE LAIS & JONATHAN — style.css
+   ================================================ */
+
+:root {
+  --white:        #ffffff;
+  --blush:        #fff6fa;
+  --fuchsia-pale: #fbd6e8;
+  --fuchsia:      #d6197e;
+  --fuchsia-deep: #8f0f56;
+  --fuchsia-ink:  #5c0a38;
+  --fuchsia-env:  #c4166d;
+  --line:         rgba(140,10,80,0.16);
+  --shadow:       0 40px 80px -20px rgba(140,10,80,0.30);
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+/* Evitar scroll horizontal em qualquer tamanho de tela */
+html { overflow-x: hidden; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  min-height: 100%;
+  background: linear-gradient(160deg,#fff8fb 0%,#fdeef5 50%,#ffffff 100%);
+  font-family: 'Cormorant Garamond', serif;
+  color: var(--fuchsia-ink);
+  overflow-x: hidden;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
+
+/* ================================================
+   PÉTALAS
+   ================================================ */
+#petal-field {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 100;
+  overflow: visible;
+  display: none;
+}
+#petal-field.active { display: block; }
+
+/* =====================================================
+   PÉTALAS — animação CSS pura
+   Cada pétala recebe duração/delay individuais via style.
+   fill-mode: forwards mantém a pétala na posição final
+   até o JS removê-la via animationend.
+   ===================================================== */
+.petal {
+  position: fixed;       /* fixed = independente de qualquer overflow do pai */
+  pointer-events: none;
+  transform-origin: center center;
+  opacity: 0;
+  will-change: transform, opacity;
+  animation-name: petalFall, petalSway;
+  animation-timing-function: linear, ease-in-out;
+  animation-iteration-count: 1, infinite;
+  animation-fill-mode: forwards, none;
+}
+
+@keyframes petalFall {
+  0%   {
+    transform: translateY(-60px) rotate(var(--rot-start, 0deg));
+    opacity: 0;
+  }
+  5%   { opacity: 0.88; }
+  95%  { opacity: 0.88; }       /* mantém visível quase até o fim */
+  100% {
+    transform: translateY(115vh) rotate(var(--rot-end, 360deg));
+    opacity: 0;                  /* fade nos últimos 5% = aprox. 0.4–0.8s */
+  }
+}
+
+@keyframes petalSway {
+  0%   { margin-left: 0px; }
+  25%  { margin-left: var(--sway-max,  30px); }
+  75%  { margin-left: var(--sway-min, -20px); }
+  100% { margin-left: 0px; }
+}
+
+/* ================================================
+   PÓ DECORATIVO
+   ================================================ */
+#dust-field {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 99;
+  overflow: visible;
+  display: none;
+}
+#dust-field.active { display: block; }
+
+.dust-particle {
+  position: fixed;
+  pointer-events: none;
+  transform-origin: center center;
+  opacity: 0;
+  will-change: transform, opacity;
+  animation-name: dustFall, petalSway;
+  animation-timing-function: linear, ease-in-out;
+  animation-iteration-count: 1, infinite;
+  animation-fill-mode: forwards, none;
+}
+
+@keyframes dustFall {
+  0%   {
+    transform: translateY(-20px) rotate(var(--rot-start, 0deg));
+    opacity: 0;
+  }
+  8%   { opacity: 0.90; }
+  92%  { opacity: 0.90; }
+  100% {
+    transform: translateY(115vh) rotate(var(--rot-end, 420deg));
+    opacity: 0;
+  }
+}
+/* ================================================
+   CENA ENVELOPE
+   ================================================ */
+#envelope-scene {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  position: relative;
+  z-index: 10;
+}
+
+#envelope-scene.hide {
+  animation: sceneFadeOut .6s ease forwards;
+  pointer-events: none;
+}
+@keyframes sceneFadeOut {
+  to { opacity: 0; transform: scale(.92); }
+}
+
+#envelope-wrap {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+}
+
+#pull-hint {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 12px;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: var(--fuchsia-deep);
+  margin: 0;
+  animation: hintPulse 2.2s ease-in-out infinite;
+}
+.hint-arrow { display: inline-block; animation: arrowBob 1.1s ease-in-out infinite; }
+@keyframes hintPulse { 0%,100%{opacity:.5} 50%{opacity:1} }
+@keyframes arrowBob  { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-5px)} }
+
+/* --- Envelope --- */
+#envelope {
+  position: relative;
+  width: min(380px, 90vw);
+  height: min(260px, 62vw);
+  cursor: pointer;
+  filter: drop-shadow(0 24px 48px rgb(140, 10, 79));
+  transition: transform .25s ease;
+  /* z-index elevado para ficar acima dos corações de fundo (::before e ::after do #envelope-scene) */
+  z-index: 5;
+  /* background sólido para bloquear completamente qualquer coração atrás do envelope */
+  background: var(--fuchsia-deep);
+  border-radius: 8px;
+}
+#envelope:hover { transform: translateY(-4px); }
+
+/* Tampa traseira (triângulo superior) */
+#env-flap {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 55%;
+  background: var(--fuchsia-deep);
+  border-radius: 8px;
+  clip-path: polygon(0 0, 100% 0, 50% 100%);
+  transform-origin: top center;
+  transition: transform .55s cubic-bezier(.4,0,.2,1);
+  z-index: 3;
+  /* Tampa completamente opaca, sem transparência */
+  opacity: 1;
+}
+#envelope.opening #env-flap {
+  transform: rotateX(180deg);
+}
+
+/* Corpo do envelope */
+#env-body {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(170deg, var(--fuchsia-env) 0%, var(--fuchsia-deep) 100%);
+  border-radius: 8px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  z-index: 2;
+  /* Garante que o corpo do envelope seja completamente opaco,
+     bloqueando qualquer elemento atrás dele (como os corações do fundo) */
+  isolation: isolate;
+}
+
+/* Triângulos laterais e inferior (dobras do envelope) */
+#env-body::before {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 50%;
+  background: var(--fuchsia);
+  clip-path: polygon(0 100%, 100% 100%, 50% 0);
+  z-index: 0;
+  opacity: .5;
+}
+#env-body::after {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; bottom: 0;
+  width: 50%;
+  background: rgba(255,255,255,.07);
+  clip-path: polygon(0 0, 0 100%, 100% 50%);
+  z-index: 0;
+}
+
+/* Losango de fechamento frontal */
+#env-diamond {
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%,-50%) rotate(45deg);
+  width: 70px; height: 70px;
+  border: 2px solid rgba(255,255,255,.35);
+  border-radius: 6px;
+  z-index: 1;
+}
+
+/* Monograma */
+#env-monogram {
+  position: absolute;
+  top: 28%;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 4;
+  font-family: 'Great Vibes', cursive;
+  font-size: clamp(22px,6vw,32px);
+  color: rgba(255,255,255,.92);
+  letter-spacing: .05em;
+  pointer-events: none;
+  white-space: nowrap;
+}
+#env-monogram span { color: var(--fuchsia-pale); }
+
+/* Canvas de brilhos saindo do envelope ao abrir — cobre toda a cena do envelope */
+#env-sparkles {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 50;
+}
+
+/* Painel de prazo encerrado — mesmo visual dos outros resultados */
+#panel-encerrado .result-icon {
+  background: var(--fuchsia-pale);
+  color: var(--fuchsia-deep);
+}
+
+/* ================================================
+   TELA DO VERSÍCULO — etapa intermediária
+   Exibida após abertura do envelope, antes do convite
+   ================================================ */
+#verse-screen {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  background: linear-gradient(160deg, #fff8fb 0%, #fdeef5 55%, #ffffff 100%);
+  align-items: center;
+  justify-content: center;
+  padding: 40px 24px;
+  opacity: 0;
+  transition: opacity 0.6s ease;
+  overflow-y: auto;
+}
+
+#verse-screen.visible {
+  display: flex;
+  animation: verseIn 0.7s ease forwards;
+}
+
+#verse-screen.hide {
+  animation: verseFade 0.5s ease forwards;
+}
+
+@keyframes verseIn {
+  from { opacity: 0; transform: translateY(18px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes verseFade {
+  from { opacity: 1; }
+  to   { opacity: 0; }
+}
+
+#verse-box {
+  max-width: 560px;
+  width: 100%;
+  text-align: center;
+  padding: 64px 52px 56px;
+  background: #ffffff;
+  border-radius: 4px;
+  position: relative;
+  box-shadow:
+    0 20px 60px -15px rgba(140,10,80,0.20),
+    0 0 0 1px rgba(212,175,55,0.30);
+  /* Ornamento dourado via pseudo-elements — borda interna dupla */
+  border: none;
+}
+
+/* Moldura dourada ornamental — camada externa (borda dupla dourada) */
+#verse-box::before {
+  content: '';
+  position: absolute;
+  inset: 6px;
+  border: 1.5px solid rgba(212,175,55,0.55);
+  border-radius: 3px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Moldura dourada ornamental — camada interna com ornamentos SVG nos cantos */
+#verse-box::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background-image:
+    /* Canto superior esquerdo — arabesco dourado */
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 80 80'%3E%3Cg fill='none' stroke='%23d4af37' stroke-width='1.2' opacity='0.85'%3E%3C!-- haste vertical principal --%3E%3Cpath d='M12,70 C12,50 12,35 12,18' stroke-width='1.4'/%3E%3C!-- haste horizontal principal --%3E%3Cpath d='M10,12 C28,12 45,12 68,12' stroke-width='1.4'/%3E%3C!-- canto curvo --%3E%3Cpath d='M12,18 Q12,12 18,12'/%3E%3C!-- folha 1 — esquerda da haste vertical --%3E%3Cpath d='M12,42 C6,36 4,30 8,26 C10,24 14,26 12,32'/%3E%3C!-- folha 2 — direita da haste vertical --%3E%3Cpath d='M12,52 C18,46 20,40 16,36 C14,34 10,36 12,42'/%3E%3C!-- folha 3 — acima da haste horizontal --%3E%3Cpath d='M38,12 C32,6 26,4 22,8 C20,10 22,14 28,12'/%3E%3C!-- folha 4 — abaixo da haste horizontal --%3E%3Cpath d='M50,12 C44,18 42,24 46,28 C48,30 52,28 50,22'/%3E%3C!-- flor no cruzamento --%3E%3Ccircle cx='12' cy='12' r='2.5' fill='%23d4af37' stroke='none'/%3E%3Ccircle cx='12' cy='12' r='4.5' fill='none' stroke='%23d4af37' stroke-width='0.8'/%3E%3Cpath d='M12,7 Q14,9 12,11 Q10,9 12,7'/%3E%3Cpath d='M12,13 Q14,15 12,17 Q10,15 12,13'/%3E%3Cpath d='M7,12 Q9,14 11,12 Q9,10 7,12'/%3E%3Cpath d='M13,12 Q15,14 17,12 Q15,10 13,12'/%3E%3C!-- ponto final da haste vertical --%3E%3Ccircle cx='12' cy='70' r='1.8' fill='%23d4af37' stroke='none'/%3E%3C!-- ponto final da haste horizontal --%3E%3Ccircle cx='68' cy='12' r='1.8' fill='%23d4af37' stroke='none'/%3E%3C/g%3E%3C/svg%3E"),
+    /* Canto superior direito — espelho horizontal */
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 80 80'%3E%3Cg fill='none' stroke='%23d4af37' stroke-width='1.2' opacity='0.85' transform='scale(-1,1) translate(-80,0)'%3E%3Cpath d='M12,70 C12,50 12,35 12,18' stroke-width='1.4'/%3E%3Cpath d='M10,12 C28,12 45,12 68,12' stroke-width='1.4'/%3E%3Cpath d='M12,18 Q12,12 18,12'/%3E%3Cpath d='M12,42 C6,36 4,30 8,26 C10,24 14,26 12,32'/%3E%3Cpath d='M12,52 C18,46 20,40 16,36 C14,34 10,36 12,42'/%3E%3Cpath d='M38,12 C32,6 26,4 22,8 C20,10 22,14 28,12'/%3E%3Cpath d='M50,12 C44,18 42,24 46,28 C48,30 52,28 50,22'/%3E%3Ccircle cx='12' cy='12' r='2.5' fill='%23d4af37' stroke='none'/%3E%3Ccircle cx='12' cy='12' r='4.5' fill='none' stroke='%23d4af37' stroke-width='0.8'/%3E%3Cpath d='M12,7 Q14,9 12,11 Q10,9 12,7'/%3E%3Cpath d='M12,13 Q14,15 12,17 Q10,15 12,13'/%3E%3Cpath d='M7,12 Q9,14 11,12 Q9,10 7,12'/%3E%3Cpath d='M13,12 Q15,14 17,12 Q15,10 13,12'/%3E%3Ccircle cx='12' cy='70' r='1.8' fill='%23d4af37' stroke='none'/%3E%3Ccircle cx='68' cy='12' r='1.8' fill='%23d4af37' stroke='none'/%3E%3C/g%3E%3C/svg%3E"),
+    /* Canto inferior esquerdo — espelho vertical */
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 80 80'%3E%3Cg fill='none' stroke='%23d4af37' stroke-width='1.2' opacity='0.85' transform='scale(1,-1) translate(0,-80)'%3E%3Cpath d='M12,70 C12,50 12,35 12,18' stroke-width='1.4'/%3E%3Cpath d='M10,12 C28,12 45,12 68,12' stroke-width='1.4'/%3E%3Cpath d='M12,18 Q12,12 18,12'/%3E%3Cpath d='M12,42 C6,36 4,30 8,26 C10,24 14,26 12,32'/%3E%3Cpath d='M12,52 C18,46 20,40 16,36 C14,34 10,36 12,42'/%3E%3Cpath d='M38,12 C32,6 26,4 22,8 C20,10 22,14 28,12'/%3E%3Cpath d='M50,12 C44,18 42,24 46,28 C48,30 52,28 50,22'/%3E%3Ccircle cx='12' cy='12' r='2.5' fill='%23d4af37' stroke='none'/%3E%3Ccircle cx='12' cy='12' r='4.5' fill='none' stroke='%23d4af37' stroke-width='0.8'/%3E%3Cpath d='M12,7 Q14,9 12,11 Q10,9 12,7'/%3E%3Cpath d='M12,13 Q14,15 12,17 Q10,15 12,13'/%3E%3Cpath d='M7,12 Q9,14 11,12 Q9,10 7,12'/%3E%3Cpath d='M13,12 Q15,14 17,12 Q15,10 13,12'/%3E%3Ccircle cx='12' cy='70' r='1.8' fill='%23d4af37' stroke='none'/%3E%3Ccircle cx='68' cy='12' r='1.8' fill='%23d4af37' stroke='none'/%3E%3C/g%3E%3C/svg%3E"),
+    /* Canto inferior direito — espelho horizontal e vertical */
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 80 80'%3E%3Cg fill='none' stroke='%23d4af37' stroke-width='1.2' opacity='0.85' transform='scale(-1,-1) translate(-80,-80)'%3E%3Cpath d='M12,70 C12,50 12,35 12,18' stroke-width='1.4'/%3E%3Cpath d='M10,12 C28,12 45,12 68,12' stroke-width='1.4'/%3E%3Cpath d='M12,18 Q12,12 18,12'/%3E%3Cpath d='M12,42 C6,36 4,30 8,26 C10,24 14,26 12,32'/%3E%3Cpath d='M12,52 C18,46 20,40 16,36 C14,34 10,36 12,42'/%3E%3Cpath d='M38,12 C32,6 26,4 22,8 C20,10 22,14 28,12'/%3E%3Cpath d='M50,12 C44,18 42,24 46,28 C48,30 52,28 50,22'/%3E%3Ccircle cx='12' cy='12' r='2.5' fill='%23d4af37' stroke='none'/%3E%3Ccircle cx='12' cy='12' r='4.5' fill='none' stroke='%23d4af37' stroke-width='0.8'/%3E%3Cpath d='M12,7 Q14,9 12,11 Q10,9 12,7'/%3E%3Cpath d='M12,13 Q14,15 12,17 Q10,15 12,13'/%3E%3Cpath d='M7,12 Q9,14 11,12 Q9,10 7,12'/%3E%3Cpath d='M13,12 Q15,14 17,12 Q15,10 13,12'/%3E%3Ccircle cx='12' cy='70' r='1.8' fill='%23d4af37' stroke='none'/%3E%3Ccircle cx='68' cy='12' r='1.8' fill='%23d4af37' stroke='none'/%3E%3C/g%3E%3C/svg%3E");
+  background-repeat: no-repeat, no-repeat, no-repeat, no-repeat;
+  background-position: top left, top right, bottom left, bottom right;
+  background-size: 80px 80px, 80px 80px, 80px 80px, 80px 80px;
+}
+
+/* Garantir que o conteúdo interno fique acima das pseudo-bordas */
+#verse-box > * {
+  position: relative;
+  z-index: 1;
+}
+
+#verse-text {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(18px, 3.2vw, 24px);
+  font-style: italic;
+  font-weight: 400;
+  line-height: 1.75;
+  color: #5c1a3a;
+  margin: 0 0 20px;
+  letter-spacing: 0.01em;
+}
+
+#verse-ref {
+  font-family: 'Montserrat', sans-serif;
+  font-size: clamp(11px, 1.8vw, 13px);
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #c4166d;
+  margin: 0 0 36px;
+}
+
+#verse-btn {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: #ffffff;
+  background: linear-gradient(135deg, #c4166d 0%, #8f0f56 100%);
+  border: none;
+  border-radius: 50px;
+  padding: 13px 40px;
+  cursor: pointer;
+  transition: opacity 0.2s ease, transform 0.15s ease;
+}
+
+#verse-btn:hover  { opacity: 0.88; }
+#verse-btn:active { transform: scale(0.97); }
+#verse-btn:focus-visible {
+  outline: 2px solid #c4166d;
+  outline-offset: 3px;
+}
+
+/* Responsividade do versículo */
+@media (max-width: 480px) {
+  #verse-box {
+    padding: 44px 28px 40px;
+  }
+  #verse-text {
+    font-size: 17px;
+    line-height: 1.7;
+  }
+  #verse-ref  { font-size: 11px; margin-bottom: 28px; }
+  #verse-btn  { padding: 11px 32px; font-size: 10px; }
+}
+
+@media (max-width: 360px) {
+  #verse-box  { padding: 36px 20px 32px; }
+  #verse-text { font-size: 15px; }
+}
+
+/* ================================================
+   CENA CONVITE
+   ================================================ */
+#invite-scene {
+  position: fixed;
+  inset: 0;
+  min-height: 100vh;
+  display: none;
+  align-items: flex-start;
+  justify-content: center;
+  overflow-y: auto;
+  padding: 0;
+  z-index: 20;
+  background: linear-gradient(160deg,#fff8fb 0%,#fdeef5 50%,#ffffff 100%);
+}
+#invite-scene.visible {
+  display: flex;
+  animation: sceneIn .7s ease forwards;
+}
+@keyframes sceneIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* ================================================
+   CARTÃO DO CONVITE
+   ================================================ */
+.invite-card {
+  position: relative;
+  width: 100%;
+  max-width: 580px;
+  background: #ffffff;
+  border: none;
+  border-radius: 4px;
+  box-shadow: 0 20px 60px -15px rgba(140,10,80,0.25);
+  padding: 80px 70px 80px;
+  text-align: center;
+  overflow: visible;
+  margin: 40px auto;
+}
+
+
+/* Canto superior esquerdo */
+
+
+
+
+/* Todo conteúdo fica acima da moldura (background não afeta z-index, mas garantir) */
+.invite-card > *:not(style) {
+  position: relative;
+  z-index: 5;
+}
+
+
+/* Moldura — arquivo Moldura.png exato fornecido pelo usuário */
+.invite-card::before {
+  content: '';
+  position: absolute;
+  top: -12%;
+  left: -12%;
+  width: 124%;
+  height: 124%;
+  background-image: url("Moldura.png");
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+  background-position: center center;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ================================================
+   ANIMAÇÃO DE ESCRITA
+   ================================================ */
+.write-in {
+  opacity: 0;
+}
+.write-in.typed {
+  opacity: 1;
+}
+
+/* Efeito "aparecer escrevendo" usando clip-path */
+.write-in.typing {
+  animation: typeReveal var(--type-dur, .8s) ease var(--type-delay, 0s) forwards;
+}
+@keyframes typeReveal {
+  0%   { opacity:0; clip-path: inset(0 100% 0 0); }
+  5%   { opacity:1; }
+  100% { opacity:1; clip-path: inset(0 0% 0 0); }
+}
+
+/* Para títulos grandes (nomes) usamos fadeUp para não cortar descritores */
+.names.typing {
+  animation: namesIn var(--type-dur,.9s) ease var(--type-delay,0s) forwards;
+}
+@keyframes namesIn {
+  from { opacity:0; transform: translateY(8px) scale(.97); filter: blur(2px); }
+  to   { opacity:1; transform: translateY(0) scale(1);    filter: blur(0); }
+}
+
+/* Linha divisória */
+.divider.typing {
+  animation: dividerGrow .6s ease var(--type-delay,0s) forwards;
+}
+@keyframes dividerGrow {
+  from { opacity:0; width:0; }
+  to   { opacity:1; width:64px; }
+}
+
+/* RSVP */
+.rsvp-wrap.typing {
+  animation: fadeUp .7s ease var(--type-delay,0s) forwards;
+}
+@keyframes fadeUp {
+  from { opacity:0; transform:translateY(12px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+
+/* ================================================
+   TIPOGRAFIA DO CONVITE
+   ================================================ */
+.eyebrow {
+  letter-spacing: .35em;
+  text-transform: uppercase;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 11px;
+  color: var(--fuchsia);
+  margin: 0 0 14px;
+}
+
+.names {
+  margin: 0;
+  font-family: 'Great Vibes', cursive;
+  font-weight: 400;
+  line-height: 1;
+  font-size: clamp(52px, 11vw, 78px);
+  color: var(--fuchsia-deep);
+}
+.names .amp {
+  display: block;
+  font-size: .85em;
+  color: var(--fuchsia-pale);
+  margin: 25px 0; /* ← sobe/desce "&" */
+}
+
+/* Controle de posição individual de cada nome
+   Ajuste os valores de 'top' conforme preferir:
+   negativo = sobe, positivo = desce */
+
+.eyebrow .vamos-casar {
+  display: block;
+  position: relative;
+  top: 0%; /* ← sobe/desce "Vamos nos casar" */
+}
+
+.names .name-lais {
+  display: block;
+  position: relative;
+  top: 10px; /* ← sobe/desce "Lais" */
+}
+
+.names .name-jonathan {
+  display: block;
+  position: relative;
+  top: -50px; /* ← sobe/desce "Jonathan" */
+}
+
+#divider-top {
+  display: block;
+  position: relative;
+  top: -25px;
+}
+
+.lede {
+  max-width: 340px;
+  margin: 20px auto 4px;
+  font-size: 18px;
+  line-height: 1.5;
+  color: var(--fuchsia-ink);
+}
+
+.date {
+  font-family: 'Great Vibes', cursive;
+  font-size: clamp(28px, 6.5vw, 40px);
+  color: var(--fuchsia);
+  margin: 18px 0 2px;
+}
+
+.weekday {
+  font-family: 'Great Vibes', cursive;
+  font-size: clamp(18px, 4.5vw, 24px);
+  color: var(--fuchsia-deep);
+  margin: 0 0 16px;
+}
+
+.divider {
+  width: 64px;
+  height: 1px;
+  margin: 4px auto 18px;
+  background: linear-gradient(90deg, transparent, var(--fuchsia), transparent);
+}
+
+.venue {
+  font-size: 17px;
+  line-height: 1.6;
+}
+.venue strong { font-weight: 600; color: var(--fuchsia-deep); }
+
+.contact {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 12px;
+  letter-spacing: .1em;
+  color: var(--fuchsia);
+  margin: 6px 0 0;
+}
+
+/* ================================================
+   RSVP
+   ================================================ */
+.rsvp-wrap {
+  margin-top: 28px;
+  padding-top: 24px;
+  border-top: 1px solid var(--line);
+}
+
+.rsvp-question {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 12px;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: var(--fuchsia);
+  margin: 0 0 16px;
+}
+
+.rsvp-buttons {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.btn {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 12px;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  padding: 12px 32px;
+  border-radius: 999px;
+  border: 1.5px solid var(--fuchsia);
+  background: transparent;
+  color: var(--fuchsia-deep);
+  cursor: pointer;
+  transition: transform .2s ease, background .2s ease, color .2s ease, box-shadow .2s ease;
+}
+.btn:hover { transform: translateY(-2px); box-shadow: 0 10px 22px -10px rgba(140,10,80,.45); }
+.btn:active { transform: translateY(0); }
+.btn:focus-visible { outline: 2px solid var(--fuchsia-deep); outline-offset: 3px; }
+.btn-primary { background: var(--fuchsia); color: var(--white); border-color: var(--fuchsia); }
+.btn-primary:hover { background: var(--fuchsia-deep); }
+.btn-ghost:hover { background: var(--fuchsia-pale); }
+
+.panel { display: none; }
+.panel.is-active { display: block; animation: panelIn .5s cubic-bezier(.2,.8,.2,1) forwards; }
+@keyframes panelIn {
+  from { opacity:0; transform:translateY(12px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+.panel-leave { animation: panelOut .28s ease forwards; }
+@keyframes panelOut { to { opacity:0; transform:translateY(-8px); } }
+
+.form-title {
+  font-family: 'Great Vibes', cursive;
+  font-size: 28px;
+  color: var(--fuchsia-deep);
+  margin: 0 0 4px;
+}
+.form-sub { font-size: 14px; color: var(--fuchsia-ink); margin: 0 0 20px; }
+
+.field { text-align: left; margin-bottom: 14px; }
+.field label {
+  display: block;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 10px;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--fuchsia);
+  margin-bottom: 5px;
+}
+.field input {
+  width: 100%;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 17px;
+  padding: 10px 13px;
+  border-radius: 7px;
+  border: 1.5px solid var(--line);
+  background: var(--blush);
+  color: var(--fuchsia-ink);
+  transition: border-color .2s, box-shadow .2s;
+}
+.field input:focus {
+  outline: none;
+  border-color: var(--fuchsia);
+  box-shadow: 0 0 0 4px rgba(214,25,126,.10);
+}
+
+.form-actions { display: flex; gap: 12px; justify-content: center; margin-top: 20px; flex-wrap: wrap; }
+
+.back-link {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 11px;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--fuchsia-deep);
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  padding: 12px 8px;
+}
+
+.result-icon {
+  width: 52px; height: 52px;
+  margin: 0 auto 12px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--fuchsia-pale);
+  color: var(--fuchsia-deep);
+  font-size: 24px;
+  animation: pop .5s cubic-bezier(.34,1.56,.64,1) forwards;
+}
+@keyframes pop { 0%{transform:scale(0)} 100%{transform:scale(1)} }
+
+.result-title { font-family:'Great Vibes',cursive; font-size:32px; color:var(--fuchsia-deep); margin:0 0 6px; }
+.result-text  { font-size:16px; line-height:1.6; color:var(--fuchsia-ink); max-width:320px; margin:0 auto; }
+.result-acompanhante { margin-top:12px; font-size:14px; font-style:italic; color:var(--fuchsia); }
+.result-names { margin-top:12px; font-family:'Montserrat',sans-serif; font-size:12px; letter-spacing:.05em; color:var(--fuchsia); }
+
+/* ================================================
+   RESPONSIVO
+   ================================================ */
+/* ================================================
+   RESPONSIVO — TABLET (max 768px)
+   ================================================ */
+
+/* ================================================
+   RESPONSIVO MOBILE — único bloco consolidado
+   Testado para 320px, 375px, 390px, 414px, 430px
+   ================================================ */
+
+/* Tablet: até 768px */
+@media (max-width: 768px) {
+  /* ---- Cena do convite ---- */
+  #invite-scene {
+    padding: 0;
+    align-items: flex-start;
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+
+  /* ---- Envelope ---- */
+  #envelope-scene {
+    padding: 32px 24px;
+  }
+
+  #envelope {
+    width: 72vw;
+    height: 50vw;
+  }
+
+  /* ---- Cartão ---- */
+  .invite-card {
+    max-width: 88vw;
+    padding: 72px 52px 72px;
+    margin: 20px auto;
+  }
+
+  .invite-card::before {
+    top: -10%;
+    left: -10%;
+    width: 120%;
+    height: 120%;
+  }
+
+  /* ---- Tipografia ---- */
+  .names {
+    font-size: clamp(44px, 10vw, 62px);
+    line-height: 1.0;
+  }
+
+  .names .name-jonathan { top: -16px; }
+
+  .date    { font-size: clamp(20px, 5vw, 32px); }
+  .weekday { font-size: clamp(14px, 3.5vw, 20px); }
+  .lede    { font-size: 14px; max-width: 100%; }
+  .venue   { font-size: 14px; }
+  .contact { font-size: 12px; }
+
+  /* ---- RSVP ---- */
+  .rsvp-buttons { gap: 10px; justify-content: center; }
+
+  /* ---- Formulário ---- */
+  .form-actions { margin-top: 18px; gap: 10px; }
+}
+
+/* Mobile: até 480px */
+@media (max-width: 480px) {
+
+  /* ---- Envelope ---- */
+  #envelope-scene {
+    padding: 24px 16px;
+    min-height: 100svh;
+  }
+
+  #envelope {
+    width: 82vw;
+    height: 56vw;
+  }
+
+  #pull-hint {
+    font-size: 10px;
+    letter-spacing: 0.2em;
+  }
+
+  /* ---- Cena do convite ---- */
+  #invite-scene {
+    padding: 0;
+    align-items: flex-start;
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+
+  /* ---- Cartão ---- */
+  .invite-card {
+    max-width: 92vw;
+    width: 92vw;
+    padding: 58px 40px 62px;
+    margin: 14px auto 24px;
+    box-shadow: 0 12px 40px -10px rgba(140,10,80,0.22);
+  }
+
+  /* Moldura: sangramento proporcional ao tamanho da tela */
+  .invite-card::before {
+    top: -9%;
+    left: -9%;
+    width: 118%;
+    height: 118%;
+  }
+
+  /* ---- Tipografia ---- */
+  .eyebrow {
+    font-size: 8px;
+    letter-spacing: 0.22em;
+    margin-bottom: 10px;
+  }
+
+  .names {
+    font-size: clamp(36px, 11vw, 48px);
+    line-height: 1.0;
+  }
+
+  .names .name-lais {
+    top: 0px;
+  }
+
+  .names .name-jonathan {
+    top: -14px; /* sobreposição reduzida para mobile */
+  }
+
+  .names .amp {
+    font-size: 0.75em;
+    margin: -2px 0;
+  }
+
+  .lede {
+    font-size: 13px;
+    line-height: 1.5;
+    margin: 14px auto 4px;
+    max-width: 100%;
+  }
+
+  .date {
+    font-size: clamp(18px, 6vw, 28px);
+    margin: 14px 0 2px;
+  }
+
+  .weekday {
+    font-size: clamp(13px, 4.2vw, 19px);
+    margin: 0 0 12px;
+  }
+
+  .divider {
+    width: 44px;
+    margin: 4px auto 14px;
+  }
+
+  .venue {
+    font-size: 13px;
+    line-height: 1.55;
+  }
+
+  .contact {
+    font-size: 11px;
+    margin-top: 4px;
+  }
+
+  /* ---- RSVP ---- */
+  .rsvp-wrap {
+    margin-top: 18px;
+    padding-top: 16px;
+  }
+
+  .rsvp-question {
+    font-size: 9px;
+    letter-spacing: 0.14em;
+    margin-bottom: 12px;
+  }
+
+  .rsvp-buttons {
+    gap: 8px;
+    flex-wrap: nowrap;
+    justify-content: center;
+  }
+
+  .btn {
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    padding: 10px 22px;
+  }
+
+  /* ---- Formulário ---- */
+  .form-title  { font-size: 22px; }
+  .form-sub    { font-size: 13px; margin-bottom: 14px; }
+
+  .field       { margin-bottom: 12px; }
+  .field label { font-size: 9px; }
+  .field input {
+    font-size: 15px;
+    padding: 9px 11px;
+  }
+
+  .form-actions {
+    margin-top: 16px;
+    gap: 8px;
+  }
+
+  /* ---- Resultado (confirmação / recusa) ---- */
+  .result-title { font-size: 26px; }
+  .result-text  { font-size: 14px; }
+  .result-names { font-size: 11px; }
+}
+
+/* Mobile muito pequeno: 360px ou menos */
+@media (max-width: 360px) {
+  .invite-card {
+    padding: 48px 30px 52px;
+  }
+
+  .invite-card::before {
+    top: -7%;
+    left: -7%;
+    width: 114%;
+    height: 114%;
+  }
+
+  .names   { font-size: 34px; line-height: 1.0; }
+  .names .name-lais     { top: 0px; }
+  .names .name-jonathan { top: -10px; }
+  .date    { font-size: 17px; }
+  .weekday { font-size: 13px; }
+  .lede    { font-size: 12px; }
+  .venue   { font-size: 12px; }
+
+  .btn { padding: 9px 18px; font-size: 10px; }
+}
+
+/* ================================================
+   TABLET LANDSCAPE / CELULAR GRANDE (481px–768px)
+   Breakpoint de ajuste fino para telas entre mobile e tablet portrait
+   ================================================ */
+@media (min-width: 481px) and (max-width: 768px) {
+  .invite-card {
+    padding: 64px 48px 68px;
+  }
+
+  .names {
+    font-size: clamp(40px, 9vw, 58px);
+    line-height: 1.0;
+  }
+
+  .names .name-jonathan { top: -14px; }
+}
+
+/* ================================================
+   TABLET PORTRAIT GRANDE / iPad (769px–1024px)
+   Garante que o convite não fique nem muito pequeno nem muito grande
+   ================================================ */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .invite-card {
+    max-width: 520px;
+    padding: 76px 60px 76px;
+  }
+
+  #envelope {
+    width: 60vw;
+    height: 41vw;
+    max-width: 480px;
+    max-height: 328px;
+  }
+}
+
+/* ================================================
+   BORDA DOURADA DO CONVITE
+   ================================================ */
+.invite-card {
+  outline: none;
+  background-color: #ffffff; /* garante fundo branco sólido — impede corações do fundo de aparecerem através do cartão */
+  box-shadow:
+    0 20px 60px -15px rgba(140,10,80,0.25),
+    0 0 0 1.5px rgba(212,175,55,0.55),
+    inset 0 0 0 1px rgba(212,175,55,0.30);
+  background-image:
+    linear-gradient(#ffffff, #ffffff),
+    linear-gradient(135deg,
+      rgba(212,175,55,0.0)   0%,
+      rgba(212,175,55,0.80) 20%,
+      rgba(255,223,100,0.95) 35%,
+      rgba(212,175,55,0.80) 50%,
+      rgba(255,223,100,0.95) 65%,
+      rgba(212,175,55,0.80) 80%,
+      rgba(212,175,55,0.0)  100%
+    );
+  background-origin: border-box;
+  background-clip: padding-box, border-box;
+  border: 1.5px solid transparent;
+  border-radius: 4px;
+}
+
+/* ================================================
+   CORACOES DECORATIVOS - FUNDO DO ENVELOPE
+   Padrao desalinhado (assimetrico), igual ao fundo do convite,
+   fucsia e azul-marinho com opacidade discreta
+   ================================================ */
+#envelope-scene::before,
+#envelope-scene::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  background-repeat: repeat;
+}
+
+/* Camada fucsia - tile 220x220 com coracoes fucsia em posicoes assimetricas */
+#envelope-scene::before {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 220 220'%3E%3Cg transform='translate(42 55)' opacity='0.12'%3E%3Cpath d='M0,-18 C6,-29 29,-29 29,-11 C29,3 16,16 0,29 C-16,16 -29,3 -29,-11 C-29,-29 -6,-29 0,-18Z' fill='%23d6197e'/%3E%3C/g%3E%3Cg transform='translate(185 145)' opacity='0.10'%3E%3Cpath d='M0,-11 C4,-18 18,-18 18,-7 C18,1 10,10 0,18 C-10,10 -18,1 -18,-7 C-18,-18 -4,-18 0,-11Z' fill='%23e766a8'/%3E%3C/g%3E%3Cg transform='translate(165 28) rotate(15)' opacity='0.08'%3E%3Cpath d='M0,-8 C3,-13 13,-13 13,-5 C13,1 7,7 0,13 C-7,7 -13,1 -13,-5 C-13,-13 -3,-13 0,-8Z' fill='%23d6197e'/%3E%3C/g%3E%3Cg transform='translate(28 195) rotate(-12)' opacity='0.08'%3E%3Cpath d='M0,-8 C3,-13 13,-13 13,-5 C13,1 7,7 0,13 C-7,7 -13,1 -13,-5 C-13,-13 -3,-13 0,-8Z' fill='%23c4166d'/%3E%3C/g%3E%3C/svg%3E");
+  background-size: 220px 220px;
+  opacity: 1;
+}
+
+/* Camada azul-marinho - tile 220x220 deslocado em meia-celula */
+#envelope-scene::after {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 220 220'%3E%3Cg transform='translate(162 145)' opacity='0.10'%3E%3Cpath d='M0,-18 C6,-29 29,-29 29,-11 C29,3 16,16 0,29 C-16,16 -29,3 -29,-11 C-29,-29 -6,-29 0,-18Z' fill='%230d1b5e'/%3E%3C/g%3E%3Cg transform='translate(42 190)' opacity='0.09'%3E%3Cpath d='M0,-11 C4,-18 18,-18 18,-7 C18,1 10,10 0,18 C-10,10 -18,1 -18,-7 C-18,-18 -4,-18 0,-11Z' fill='%23162a8a'/%3E%3C/g%3E%3Cg transform='translate(18 55) rotate(-10)' opacity='0.07'%3E%3Cpath d='M0,-8 C3,-13 13,-13 13,-5 C13,1 7,7 0,13 C-7,7 -13,1 -13,-5 C-13,-13 -3,-13 0,-8Z' fill='%230d1b5e'/%3E%3C/g%3E%3Cg transform='translate(185 28) rotate(10)' opacity='0.07'%3E%3Cpath d='M0,-8 C3,-13 13,-13 13,-5 C13,1 7,7 0,13 C-7,7 -13,1 -13,-5 C-13,-13 -3,-13 0,-8Z' fill='%23162a8a'/%3E%3C/g%3E%3C/svg%3E");
+  background-size: 220px 220px;
+  background-position: 110px 110px;
+  opacity: 1;
+}
+
+/* ================================================
+   CORACOES DECORATIVOS - FUNDO DA CENA DO CONVITE
+   Fucsia e azul-marinho, discretos, cobrindo toda a area
+   ================================================ */
+/* Padrao de coracoes repetido cobrindo todo o fundo do convite
+   - tile de 220x220px com coracoes fucsia e azul-marinho intercalados */
+#invite-scene {
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 220 220'%3E%3Cg transform='translate(42 55)' opacity='0.13'%3E%3Cpath d='M0,-18 C6,-29 29,-29 29,-11 C29,3 16,16 0,29 C-16,16 -29,3 -29,-11 C-29,-29 -6,-29 0,-18Z' fill='%23d6197e'/%3E%3C/g%3E%3Cg transform='translate(162 145)' opacity='0.11'%3E%3Cpath d='M0,-18 C6,-29 29,-29 29,-11 C29,3 16,16 0,29 C-16,16 -29,3 -29,-11 C-29,-29 -6,-29 0,-18Z' fill='%230d1b5e'/%3E%3C/g%3E%3Cg transform='translate(185 30) rotate(15)' opacity='0.09'%3E%3Cpath d='M0,-12 C4,-19 19,-19 19,-7 C19,1 11,11 0,19 C-11,11 -19,1 -19,-7 C-19,-19 -4,-19 0,-12Z' fill='%23d6197e'/%3E%3C/g%3E%3Cg transform='translate(28 190) rotate(-15)' opacity='0.09'%3E%3Cpath d='M0,-12 C4,-19 19,-19 19,-7 C19,1 11,11 0,19 C-11,11 -19,1 -19,-7 C-19,-19 -4,-19 0,-12Z' fill='%230d1b5e'/%3E%3C/g%3E%3C/svg%3E") 0 0 / 220px 220px repeat,
+    linear-gradient(160deg,#fff8fb 0%,#fdeef5 50%,#ffffff 100%);
+}
