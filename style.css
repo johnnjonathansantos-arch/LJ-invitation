@@ -1073,9 +1073,9 @@ html, body {
 }
 
 /* ================================================
-   CORACOES DECORATIVOS - FUNDO DO ENVELOPE
-   Padrao desalinhado (assimetrico), igual ao fundo do convite,
-   fucsia e azul-marinho com opacidade discreta
+   L&J DECORATIVO - FUNDO DO ENVELOPE
+   Tipografia cursiva dourada, baixa opacidade,
+   distribuicao irregular e discreta
    ================================================ */
 #envelope-scene::before,
 #envelope-scene::after {
@@ -1087,18 +1087,18 @@ html, body {
   background-repeat: repeat;
 }
 
-/* Camada fucsia - tile 220x220 com coracoes fucsia em posicoes assimetricas */
+/* Camada principal - tile 260x260 com L&J em posicoes e rotacoes variadas */
 #envelope-scene::before {
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 220 220'%3E%3Cg transform='translate(42 55)' opacity='0.12'%3E%3Cpath d='M0,-18 C6,-29 29,-29 29,-11 C29,3 16,16 0,29 C-16,16 -29,3 -29,-11 C-29,-29 -6,-29 0,-18Z' fill='%23d6197e'/%3E%3C/g%3E%3Cg transform='translate(185 145)' opacity='0.10'%3E%3Cpath d='M0,-11 C4,-18 18,-18 18,-7 C18,1 10,10 0,18 C-10,10 -18,1 -18,-7 C-18,-18 -4,-18 0,-11Z' fill='%23e766a8'/%3E%3C/g%3E%3Cg transform='translate(165 28) rotate(15)' opacity='0.08'%3E%3Cpath d='M0,-8 C3,-13 13,-13 13,-5 C13,1 7,7 0,13 C-7,7 -13,1 -13,-5 C-13,-13 -3,-13 0,-8Z' fill='%23d6197e'/%3E%3C/g%3E%3Cg transform='translate(28 195) rotate(-12)' opacity='0.08'%3E%3Cpath d='M0,-8 C3,-13 13,-13 13,-5 C13,1 7,7 0,13 C-7,7 -13,1 -13,-5 C-13,-13 -3,-13 0,-8Z' fill='%23c4166d'/%3E%3C/g%3E%3C/svg%3E");
-  background-size: 220px 220px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 260 260'%3E%3Ctext x='38' y='72' font-family='Georgia%2C Times New Roman%2C serif' font-style='italic' font-size='28' fill='%23d4af37' opacity='0.15' transform='rotate(-8 38 72)'%3EL%26amp%3BJ%3C/text%3E%3Ctext x='158' y='155' font-family='Georgia%2C Times New Roman%2C serif' font-style='italic' font-size='20' fill='%23d4af37' opacity='0.12' transform='rotate(12 158 155)'%3EL%26amp%3BJ%3C/text%3E%3Ctext x='72' y='210' font-family='Georgia%2C Times New Roman%2C serif' font-style='italic' font-size='16' fill='%23c8a42a' opacity='0.10' transform='rotate(-5 72 210)'%3EL%26amp%3BJ%3C/text%3E%3Ctext x='195' y='38' font-family='Georgia%2C Times New Roman%2C serif' font-style='italic' font-size='14' fill='%23d4af37' opacity='0.11' transform='rotate(18 195 38)'%3EL%26amp%3BJ%3C/text%3E%3C/svg%3E");
+  background-size: 260px 260px;
   opacity: 1;
 }
 
-/* Camada azul-marinho - tile 220x220 deslocado em meia-celula */
+/* Camada secundaria - tile 260x260 deslocado para variar o padrao */
 #envelope-scene::after {
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 220 220'%3E%3Cg transform='translate(162 145)' opacity='0.10'%3E%3Cpath d='M0,-18 C6,-29 29,-29 29,-11 C29,3 16,16 0,29 C-16,16 -29,3 -29,-11 C-29,-29 -6,-29 0,-18Z' fill='%230d1b5e'/%3E%3C/g%3E%3Cg transform='translate(42 190)' opacity='0.09'%3E%3Cpath d='M0,-11 C4,-18 18,-18 18,-7 C18,1 10,10 0,18 C-10,10 -18,1 -18,-7 C-18,-18 -4,-18 0,-11Z' fill='%23162a8a'/%3E%3C/g%3E%3Cg transform='translate(18 55) rotate(-10)' opacity='0.07'%3E%3Cpath d='M0,-8 C3,-13 13,-13 13,-5 C13,1 7,7 0,13 C-7,7 -13,1 -13,-5 C-13,-13 -3,-13 0,-8Z' fill='%230d1b5e'/%3E%3C/g%3E%3Cg transform='translate(185 28) rotate(10)' opacity='0.07'%3E%3Cpath d='M0,-8 C3,-13 13,-13 13,-5 C13,1 7,7 0,13 C-7,7 -13,1 -13,-5 C-13,-13 -3,-13 0,-8Z' fill='%23162a8a'/%3E%3C/g%3E%3C/svg%3E");
-  background-size: 220px 220px;
-  background-position: 110px 110px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 260 260'%3E%3Ctext x='120' y='90' font-family='Georgia%2C Times New Roman%2C serif' font-style='italic' font-size='24' fill='%23d4af37' opacity='0.13' transform='rotate(-14 120 90)'%3EL%26amp%3BJ%3C/text%3E%3Ctext x='22' y='170' font-family='Georgia%2C Times New Roman%2C serif' font-style='italic' font-size='18' fill='%23c8a42a' opacity='0.11' transform='rotate(7 22 170)'%3EL%26amp%3BJ%3C/text%3E%3Ctext x='178' y='228' font-family='Georgia%2C Times New Roman%2C serif' font-style='italic' font-size='15' fill='%23d4af37' opacity='0.10' transform='rotate(-10 178 228)'%3EL%26amp%3BJ%3C/text%3E%3Ctext x='210' y='130' font-family='Georgia%2C Times New Roman%2C serif' font-style='italic' font-size='12' fill='%23d4af37' opacity='0.09' transform='rotate(20 210 130)'%3EL%26amp%3BJ%3C/text%3E%3C/svg%3E");
+  background-size: 260px 260px;
+  background-position: 130px 130px;
   opacity: 1;
 }
 
