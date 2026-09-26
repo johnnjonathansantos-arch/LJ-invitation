@@ -405,12 +405,12 @@
     // 4. NÃO existe nenhum controle de remoção global por tempo.
     // -------------------------------------------------------
     var PETAL_START_DELAY  = 3500;   // ms — delay antes de começar
-    var PETAL_RAIN_DURATION = 6000; // ms — janela de criação (10s)
+    var PETAL_RAIN_DURATION = 8000; // ms — janela de criação (10s)
 
     setTimeout(function () {
 
       // -- Rajada inicial: 12 pétalas espaçadas nos primeiros 2.5s --
-      for (var i = 0; i < 4; i++) {
+      for (var i = 0; i < 6; i++) {
         (function (idx) {
           setTimeout(function () {
             spawnPetal();
