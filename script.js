@@ -399,13 +399,13 @@
     // -------------------------------------------------------
     // REGRAS:
     // 1. Aguarda PETAL_START_DELAY antes de criar a primeira pétala.
-    // 2. Durante PETAL_RAIN_DURATION (10s) cria pétalas continuamente.
+    // 2. Durante PETAL_RAIN_DURATION (6s) cria pétalas continuamente.
     // 3. Após 10s para a criação — as pétalas existentes continuam
     //    sua animação CSS individualmente até terminarem (animationend).
     // 4. NÃO existe nenhum controle de remoção global por tempo.
     // -------------------------------------------------------
     var PETAL_START_DELAY  = 3000;   // ms — delay antes de começar
-    var PETAL_RAIN_DURATION = 10000; // ms — janela de criação (10s)
+    var PETAL_RAIN_DURATION = 6000; // ms — janela de criação (10s)
 
     setTimeout(function () {
 
