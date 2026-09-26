@@ -410,7 +410,7 @@
     setTimeout(function () {
 
       // -- Rajada inicial: 12 pétalas espaçadas nos primeiros 2.5s --
-      for (var i = 0; i < 12; i++) {
+      for (var i = 0; i < 8; i++) {
         (function (idx) {
           setTimeout(function () {
             spawnPetal();
