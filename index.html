@@ -103,11 +103,21 @@
         </form>
       </div>
 
+      <div id="panel-acompanhante" class="panel">
+        <div class="result-icon">&#10084;</div>
+        <p class="result-title">Quase lá!</p>
+        <p class="form-sub">Vai levar acompanhante?</p>
+        <div class="rsvp-buttons">
+          <button type="button" class="btn btn-primary" id="btn-acomp-sim">Sim</button>
+          <button type="button" class="btn btn-ghost"   id="btn-acomp-nao">Não</button>
+        </div>
+      </div>
+
       <div id="panel-obrigado" class="panel">
         <div class="result-icon">&#10084;</div>
         <p class="result-title">Presença confirmada</p>
         <p class="result-text" id="obrigado-texto">Mal podemos esperar para celebrar esse dia com você!</p>
-        <p class="result-text result-acompanhante" id="obrigado-acompanhante-msg" style="display:none;"></p>
+        <p class="msg-acompanhante" id="msg-acompanhante" style="display:none;">Por gentileza chamar no WhatsApp para verificação junto aos noivos</p>
         <a class="btn btn-primary btn-wa" id="btn-whatsapp-sim" href="#" target="_blank" rel="noopener">Enviar confirmação por WhatsApp</a>
         <p class="result-names">Toque no botão para que sua confirmação chegue até nós.</p>
       </div>

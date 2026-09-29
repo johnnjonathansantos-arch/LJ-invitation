@@ -1119,3 +1119,27 @@ html, body {
   text-decoration: none;
   margin-top: 16px;
 }
+
+/* ================================================
+   PAINEL ACOMPANHANTE
+   ================================================ */
+#panel-acompanhante .form-sub {
+  font-size: 16px;
+  margin-bottom: 20px;
+  color: var(--fuchsia-ink);
+}
+
+.msg-acompanhante {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--fuchsia-deep);
+  background: var(--fuchsia-pale);
+  border: 1px solid var(--fuchsia);
+  border-radius: 8px;
+  padding: 12px 16px;
+  margin: 14px auto 4px;
+  max-width: 320px;
+  line-height: 1.5;
+}

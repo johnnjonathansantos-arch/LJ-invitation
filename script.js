@@ -447,11 +447,12 @@
      RSVP — troca de painéis
      ================================================ */
   var panels = {
-    question:  document.getElementById('panel-question'),
-    form:      document.getElementById('panel-form'),
-    obrigado:  document.getElementById('panel-obrigado'),
-    nao:       document.getElementById('panel-nao'),
-    encerrado: document.getElementById('panel-encerrado')
+    question:     document.getElementById('panel-question'),
+    form:         document.getElementById('panel-form'),
+    acompanhante: document.getElementById('panel-acompanhante'),
+    obrigado:     document.getElementById('panel-obrigado'),
+    nao:          document.getElementById('panel-nao'),
+    encerrado:    document.getElementById('panel-encerrado')
   };
 
   function showPanel(target) {
@@ -495,14 +496,28 @@
     document.getElementById('obrigado-texto').textContent =
       'Mal podemos esperar para celebrar esse dia com você, ' + nome + '!';
 
-    var msgAcomp = document.getElementById('obrigado-acompanhante-msg');
-    if (msgAcomp) {
-      msgAcomp.textContent = 'Se for levar acompanhante, informe o nome dele(a) na mensagem do WhatsApp.';
-      msgAcomp.style.display = 'block';
-    }
+    // Vai para a etapa de acompanhante antes de mostrar o painel final
+    showPanel(panels.acompanhante);
+  });
+
+  /* ---- Botão "Sim" — vai levar acompanhante ---- */
+  document.getElementById('btn-acomp-sim').addEventListener('click', function () {
+    var msgEl = document.getElementById('msg-acompanhante');
+    msgEl.style.display = 'block';
 
     var link = document.getElementById('btn-whatsapp-sim');
-    link.href = whatsappLink('Olá! Aqui é ' + nome + '. Confirmo minha presença no casamento de Lais & Jonathan, dia 11/09/2027. ');
+    link.href = whatsappLink('Olá! Aqui é ' + guestName + '. Confirmo minha presença no casamento de Lais & Jonathan, dia 11/09/2027. Vou levar acompanhante. ');
+
+    showPanel(panels.obrigado);
+  });
+
+  /* ---- Botão "Não" — sem acompanhante ---- */
+  document.getElementById('btn-acomp-nao').addEventListener('click', function () {
+    var msgEl = document.getElementById('msg-acompanhante');
+    msgEl.style.display = 'none';
+
+    var link = document.getElementById('btn-whatsapp-sim');
+    link.href = whatsappLink('Olá! Aqui é ' + guestName + '. Confirmo minha presença no casamento de Lais & Jonathan, dia 11/09/2027. ');
 
     showPanel(panels.obrigado);
   });
