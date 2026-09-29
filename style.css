@@ -496,14 +496,10 @@ html, body {
   width: 124%;
   height: 124%;
   /* 1ª camada: Moldura.png (se existir). 2ª camada: moldura SVG de reserva. */
-  background-image:
-    url("Moldura.png"),
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' preserveAspectRatio='none'%3E%3Crect x='5' y='5' width='90' height='90' fill='none' stroke='%23d4af37' stroke-width='0.35' vector-effect='non-scaling-stroke'/%3E%3Crect x='6.5' y='6.5' width='87' height='87' fill='none' stroke='%23d6197e' stroke-opacity='0.35' stroke-width='0.25' vector-effect='non-scaling-stroke'/%3E%3C/svg%3E");
-  background-repeat: no-repeat, no-repeat;
-  background-size: 100% 100%, 100% 100%;
-  background-position: center center, center center;
-  pointer-events: none;
-  z-index: 0;
+    background-image: url("Moldura.png");
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+    background-position: center center;
 }
 
 /* ================================================
