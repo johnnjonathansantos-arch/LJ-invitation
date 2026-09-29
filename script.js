@@ -258,6 +258,8 @@
     ['#ffeaf4', '#f090b8', '#c4166d'],
   ];
 
+  var petalUid = 0;
+
   function spawnPetal() {
     if (reduceMotion) return;
 
@@ -265,6 +267,10 @@
     var colorIdx = Math.floor(Math.random() * petalColors.length);
     var colors   = petalColors[colorIdx];
     var svgStr   = petalShapes[shapeIdx](colors[0], colors[1], colors[2]);
+
+    // ID único por pétala: evita que gradientes com o mesmo id se sobreponham
+    petalUid++;
+    svgStr = svgStr.split('pg' + shapeIdx).join('pg' + shapeIdx + '_' + petalUid);
 
     var p = document.createElement('div');
     p.className = 'petal';
@@ -470,20 +476,33 @@
 
   document.getElementById('btn-voltar-form').addEventListener('click', function () { showPanel(panels.question); });
 
+  /* ---- RSVP via WhatsApp ----
+     As confirmações chegam ao número abaixo (formato internacional, só dígitos). */
+  var WHATSAPP_NUMBER = '5511951315012';
+
+  function whatsappLink(msg) {
+    return 'https://wa.me/' + WHATSAPP_NUMBER + '?text=' + encodeURIComponent(msg);
+  }
+
+  var guestName = '';
+
   document.getElementById('rsvp-form').addEventListener('submit', function (e) {
     e.preventDefault();
     var nome = document.getElementById('nome').value.trim();
     if (!nome) { document.getElementById('nome').focus(); return; }
+    guestName = nome;
 
-    var texto = 'Mal podemos esperar para celebrar esse dia com você, ' + nome + '!';
-    document.getElementById('obrigado-texto').textContent = texto;
+    document.getElementById('obrigado-texto').textContent =
+      'Mal podemos esperar para celebrar esse dia com você, ' + nome + '!';
 
-    // Mensagem sobre acompanhante via WhatsApp da assessoria
     var msgAcomp = document.getElementById('obrigado-acompanhante-msg');
     if (msgAcomp) {
-      msgAcomp.textContent = 'Informe pelo WhatsApp da acessoria se vai levar um acompanhante e os dados do mesmo';
+      msgAcomp.textContent = 'Se for levar acompanhante, informe o nome dele(a) na mensagem do WhatsApp.';
       msgAcomp.style.display = 'block';
     }
+
+    var link = document.getElementById('btn-whatsapp-sim');
+    link.href = whatsappLink('Olá! Aqui é ' + nome + '. Confirmo minha presença no casamento de Lais & Jonathan, dia 11/09/2027. ');
 
     showPanel(panels.obrigado);
   });
@@ -503,7 +522,11 @@
     showPanel(panels.encerrado);
   } else {
     document.getElementById('btn-sim').addEventListener('click', function () { showPanel(panels.form); });
-    document.getElementById('btn-nao').addEventListener('click', function () { showPanel(panels.nao); });
+    document.getElementById('btn-nao').addEventListener('click', function () {
+      document.getElementById('btn-whatsapp-nao').href =
+        whatsappLink('Olá! Infelizmente não poderei comparecer ao casamento de Lais & Jonathan. Agradeço o convite!');
+      showPanel(panels.nao);
+    });
   }
 
 })();

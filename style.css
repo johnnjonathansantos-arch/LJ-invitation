@@ -1,4 +1,4 @@
-﻿/* ================================================
+/* ================================================
    CONVITE LAIS & JONATHAN — style.css
    ================================================ */
 
@@ -495,10 +495,13 @@ html, body {
   left: -12%;
   width: 124%;
   height: 124%;
-  background-image: url("Moldura.png");
-  background-repeat: no-repeat;
-  background-size: 100% 100%;
-  background-position: center center;
+  /* 1ª camada: Moldura.png (se existir). 2ª camada: moldura SVG de reserva. */
+  background-image:
+    url("Moldura.png"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' preserveAspectRatio='none'%3E%3Crect x='5' y='5' width='90' height='90' fill='none' stroke='%23d4af37' stroke-width='0.35' vector-effect='non-scaling-stroke'/%3E%3Crect x='6.5' y='6.5' width='87' height='87' fill='none' stroke='%23d6197e' stroke-opacity='0.35' stroke-width='0.25' vector-effect='non-scaling-stroke'/%3E%3C/svg%3E");
+  background-repeat: no-repeat, no-repeat;
+  background-size: 100% 100%, 100% 100%;
+  background-position: center center, center center;
   pointer-events: none;
   z-index: 0;
 }
@@ -1112,4 +1115,11 @@ html, body {
   background:
     url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 220 220'%3E%3Cg transform='translate(42 55)' opacity='0.13'%3E%3Cpath d='M0,-18 C6,-29 29,-29 29,-11 C29,3 16,16 0,29 C-16,16 -29,3 -29,-11 C-29,-29 -6,-29 0,-18Z' fill='%23d6197e'/%3E%3C/g%3E%3Cg transform='translate(162 145)' opacity='0.11'%3E%3Cpath d='M0,-18 C6,-29 29,-29 29,-11 C29,3 16,16 0,29 C-16,16 -29,3 -29,-11 C-29,-29 -6,-29 0,-18Z' fill='%230d1b5e'/%3E%3C/g%3E%3Cg transform='translate(185 30) rotate(15)' opacity='0.09'%3E%3Cpath d='M0,-12 C4,-19 19,-19 19,-7 C19,1 11,11 0,19 C-11,11 -19,1 -19,-7 C-19,-19 -4,-19 0,-12Z' fill='%23d6197e'/%3E%3C/g%3E%3Cg transform='translate(28 190) rotate(-15)' opacity='0.09'%3E%3Cpath d='M0,-12 C4,-19 19,-19 19,-7 C19,1 11,11 0,19 C-11,11 -19,1 -19,-7 C-19,-19 -4,-19 0,-12Z' fill='%230d1b5e'/%3E%3C/g%3E%3C/svg%3E") 0 0 / 220px 220px repeat,
     linear-gradient(160deg,#fff8fb 0%,#fdeef5 50%,#ffffff 100%);
+}
+
+/* Botão de WhatsApp do RSVP */
+.btn-wa {
+  display: inline-block;
+  text-decoration: none;
+  margin-top: 16px;
 }
