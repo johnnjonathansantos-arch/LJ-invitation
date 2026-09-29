@@ -8,7 +8,7 @@ Convite de casamento digital, interativo e responsivo, desenvolvido com HTML, CS
 - **Animação de escrita sequencial**: os elementos do convite (nomes, data, local, etc.) aparecem em sequência, como se estivessem sendo escritos.
 - **Chuva de pétalas de rosa**: pétalas em SVG, com formatos e cores variados, geradas dinamicamente via JavaScript e animadas em CSS.
 - **RSVP (confirmação de presença)**:
-  - Formulário para nome completo e nome do acompanhante.
+  - Formulário para nome completo; a confirmação é enviada ao WhatsApp dos noivos por link `wa.me` pré-preenchido.
   - Painéis distintos para confirmação ("Sim"), ausência ("Não") e agradecimento.
   - **Prazo de confirmação automático**: a partir de uma data limite definida no código, o formulário é substituído por um aviso de "Prazo encerrado".
 - **Responsivo**: layout adaptado para dispositivos móveis (`viewport-fit=cover`).
@@ -53,7 +53,8 @@ Para reutilizar este convite em outro evento, os principais pontos a editar são
 
 ## 📌 Observações
 
-- O formulário de RSVP atualmente processa a confirmação apenas no navegador (client-side), sem envio a um backend ou banco de dados. Para armazenar as respostas, é necessário integrar um serviço de formulários (ex: Formspree, Google Forms) ou uma API própria.
+- O RSVP não usa backend: o convidado toca em um botão que abre o WhatsApp com a mensagem pronta (número em `WHATSAPP_NUMBER`, no `script.js`). Para uma lista automática de respostas, integre um serviço como Google Forms ou Formspree.
+- O arquivo `Moldura.png` deve ficar na mesma pasta do `index.html`. Se ele faltar, uma moldura SVG simples é exibida no lugar.
 
 ## 📄 Licença
 
