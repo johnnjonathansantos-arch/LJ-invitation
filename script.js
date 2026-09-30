@@ -485,6 +485,43 @@
     return 'https://wa.me/' + WHATSAPP_NUMBER + '?text=' + encodeURIComponent(msg);
   }
 
+  /* ================================================
+     INTEGRAÇÃO GOOGLE SHEETS
+     Endpoint do Google Apps Script Web App.
+     ================================================ */
+  var SHEETS_URL = 'https://script.google.com/macros/s/AKfycby9bCVF-Va9ThNxkmhRQq_5LiEEkqgCFYIcbxVsoj0qKrFkm4uZCjZJOzjm8ZajnWIW/exec';
+
+  /**
+   * Envia os dados para o Google Sheets.
+   *
+   * Usa URLSearchParams + mode:'no-cors' porque o Google Apps Script
+   * não suporta CORS completo para POST de origens externas.
+   * Com 'no-cors' a resposta fica opaca (não pode ser lida),
+   * mas o servidor recebe e processa os dados corretamente.
+   *
+   * @param {Object} dados  { nome, presenca, acompanhante }
+   */
+  function registrarNaPlanilha(dados) {
+    if (!SHEETS_URL) return;
+
+    // Formata como application/x-www-form-urlencoded
+    var params = new URLSearchParams();
+    params.append('nome',         dados.nome         || '');
+    params.append('presenca',     dados.presenca     || 'Sim');
+    params.append('acompanhante', dados.acompanhante || 'Não');
+
+    fetch(SHEETS_URL, {
+      method:  'POST',
+      mode:    'no-cors',          // essencial para Apps Script sem CORS
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body:    params.toString()
+    })
+    .catch(function (err) {
+      // Falha de rede — não interrompe o fluxo do convite
+      console.warn('[Planilha] Falha ao enviar:', err);
+    });
+  }
+
   var guestName = '';
 
   document.getElementById('rsvp-form').addEventListener('submit', function (e) {
@@ -508,6 +545,9 @@
     var link = document.getElementById('btn-whatsapp-sim');
     link.href = whatsappLink('Olá! Aqui é ' + guestName + '. Confirmo minha presença no casamento de Lais & Jonathan, dia 11/09/2027.\n\nVou levar acompanhante. ');
 
+    // Registra na planilha — assíncrono, não bloqueia o fluxo
+    registrarNaPlanilha({ nome: guestName, presenca: 'Sim', acompanhante: 'Sim' });
+
     showPanel(panels.obrigado);
   });
 
@@ -518,6 +558,9 @@
 
     var link = document.getElementById('btn-whatsapp-sim');
     link.href = whatsappLink('Olá! Aqui é ' + guestName + '. Confirmo minha presença no casamento de Lais & Jonathan, dia 11/09/2027. ');
+
+    // Registra na planilha — assíncrono, não bloqueia o fluxo
+    registrarNaPlanilha({ nome: guestName, presenca: 'Sim', acompanhante: 'Não' });
 
     showPanel(panels.obrigado);
   });
