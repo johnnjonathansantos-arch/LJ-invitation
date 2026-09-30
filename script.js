@@ -506,7 +506,7 @@
     msgEl.style.display = 'block';
 
     var link = document.getElementById('btn-whatsapp-sim');
-    link.href = whatsappLink('Olá! Aqui é ' + guestName + '. Confirmo minha presença no casamento de Lais & Jonathan, dia 11/09/2027. Vou levar acompanhante. ');
+    link.href = whatsappLink('Olá! Aqui é ' + guestName + '. Confirmo minha presença no casamento de Lais & Jonathan, dia 11/09/2027.\n\nVou levar acompanhante. ');
 
     showPanel(panels.obrigado);
   });
