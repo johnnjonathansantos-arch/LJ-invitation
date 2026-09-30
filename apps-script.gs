@@ -2,8 +2,8 @@
 // CONVITE DE CASAMENTO — Lais & Jonathan
 // Google Apps Script — Registro de confirmações de presença
 //
-// INSTRUÇÕES DE INSTALAÇÃO:
-//   1. Abra script.google.com e abra o projeto vinculado a este Web App.
+// INSTRUÇÕES DE INSTALAÇÃO / ATUALIZAÇÃO:
+//   1. Abra script.google.com e acesse o projeto vinculado ao Web App.
 //   2. Substitua TODO o código existente pelo conteúdo deste arquivo.
 //   3. Clique em "Implantar" > "Gerenciar implantações".
 //   4. Clique no lápis (editar) na implantação existente.
@@ -18,88 +18,96 @@
 // ============================================================
 
 // Nome da aba onde os dados serão gravados.
-// Se a aba não existir, ela será criada automaticamente.
 var SHEET_NAME = 'Confirmações';
 
-/**
- * Recebe requisições POST do convite.
- * Aceita tanto JSON (application/json) quanto
- * form-urlencoded (application/x-www-form-urlencoded).
- */
-function doPost(e) {
-  try {
-    var nome         = '';
-    var presenca     = 'Sim';
-    var acompanhante = 'Não';
+// ── doGet ────────────────────────────────────────────────────
+// Recebe requisições GET com os dados em query string.
+// Método principal para mobile (pixel beacon / fetch GET).
+// Exemplo: ?nome=João&presenca=Sim&acompanhante=Não
+// ─────────────────────────────────────────────────────────────
+function doGet(e) {
+  // Verificação de status (sem parâmetros)
+  if (!e.parameter || !e.parameter.nome) {
+    return jsonResponse({ ok: true, status: 'online' });
+  }
 
-    // ── Tentar ler como JSON primeiro ─────────────────────
+  return processarConfirmacao(e.parameter);
+}
+
+// ── doPost ───────────────────────────────────────────────────
+// Recebe requisições POST com dados em JSON ou form-urlencoded.
+// Mantido para compatibilidade com desktop.
+// ─────────────────────────────────────────────────────────────
+function doPost(e) {
+  var params = {};
+
+  try {
+    // Tenta ler como JSON primeiro
     if (e.postData && e.postData.contents) {
       try {
-        var dados = JSON.parse(e.postData.contents);
-        nome         = (dados.nome         || '').toString().trim();
-        presenca     = (dados.presenca     || 'Sim').toString().trim();
-        acompanhante = (dados.acompanhante || 'Não').toString().trim();
-      } catch (jsonErr) {
-        // Não é JSON — tenta como parâmetros de formulário
-        nome         = (e.parameter.nome         || '').toString().trim();
-        presenca     = (e.parameter.presenca     || 'Sim').toString().trim();
-        acompanhante = (e.parameter.acompanhante || 'Não').toString().trim();
+        params = JSON.parse(e.postData.contents);
+      } catch (_) {
+        // Fallback: parâmetros de formulário
+        params = e.parameter || {};
       }
     } else {
-      // Fallback: parâmetros de URL/formulário
-      nome         = (e.parameter.nome         || '').toString().trim();
-      presenca     = (e.parameter.presenca     || 'Sim').toString().trim();
-      acompanhante = (e.parameter.acompanhante || 'Não').toString().trim();
+      params = e.parameter || {};
     }
+  } catch (err) {
+    return jsonResponse({ ok: false, erro: 'Erro ao ler dados: ' + err.message });
+  }
 
-    // ── Validar nome ──────────────────────────────────────
+  return processarConfirmacao(params);
+}
+
+// ── processarConfirmacao ─────────────────────────────────────
+// Valida os dados e grava na planilha.
+// Usado tanto pelo doGet quanto pelo doPost.
+// ─────────────────────────────────────────────────────────────
+function processarConfirmacao(params) {
+  try {
+    var nome         = ((params.nome         || '') + '').trim();
+    var presenca     = ((params.presenca     || 'Sim') + '').trim();
+    var acompanhante = ((params.acompanhante || 'Não') + '').trim();
+
     if (!nome) {
       return jsonResponse({ ok: false, erro: 'Nome não informado' });
     }
 
-    // ── Acessar planilha ──────────────────────────────────
-    // getActiveSpreadsheet() funciona automaticamente quando o script
-    // está vinculado a uma planilha (não precisa de SPREADSHEET_ID).
+    // Acessa a planilha vinculada ao script
     var ss    = SpreadsheetApp.getActiveSpreadsheet();
     var sheet = ss.getSheetByName(SHEET_NAME);
 
-    // Criar aba e cabeçalho se não existirem
+    // Cria a aba e o cabeçalho se não existirem
     if (!sheet) {
       sheet = ss.insertSheet(SHEET_NAME);
       sheet.appendRow(['Data/Hora', 'Nome', 'Presença', 'Acompanhante']);
       sheet.getRange(1, 1, 1, 4).setFontWeight('bold');
     }
 
-    // ── Data/hora no fuso de Brasília ─────────────────────
+    // Data/hora no fuso de Brasília
     var agora = Utilities.formatDate(
       new Date(),
       'America/Sao_Paulo',
       'dd/MM/yyyy HH:mm:ss'
     );
 
-    // ── Gravar linha ──────────────────────────────────────
+    // Grava a linha
     sheet.appendRow([agora, nome, presenca, acompanhante]);
+
+    Logger.log('Registrado: ' + nome + ' | ' + presenca + ' | ' + acompanhante);
 
     return jsonResponse({ ok: true, mensagem: 'Registrado com sucesso' });
 
   } catch (err) {
-    Logger.log('Erro doPost: ' + err.message);
+    Logger.log('Erro processarConfirmacao: ' + err.message);
     return jsonResponse({ ok: false, erro: err.message });
   }
 }
 
-/**
- * Responde ao GET de verificação (e também ao preflight do browser).
- */
-function doGet(e) {
-  return jsonResponse({ ok: true, status: 'online' });
-}
-
-/**
- * Cria uma resposta JSON com headers permissivos para CORS.
- */
+// ── jsonResponse ─────────────────────────────────────────────
 function jsonResponse(obj) {
-  var output = ContentService.createTextOutput(JSON.stringify(obj));
-  output.setMimeType(ContentService.MimeType.JSON);
-  return output;
+  return ContentService
+    .createTextOutput(JSON.stringify(obj))
+    .setMimeType(ContentService.MimeType.JSON);
 }

@@ -451,6 +451,7 @@
     form:         document.getElementById('panel-form'),
     acompanhante: document.getElementById('panel-acompanhante'),
     obrigado:     document.getElementById('panel-obrigado'),
+    nomeNao:      document.getElementById('panel-nome-nao'),
     nao:          document.getElementById('panel-nao'),
     encerrado:    document.getElementById('panel-encerrado')
   };
@@ -477,6 +478,9 @@
 
   document.getElementById('btn-voltar-form').addEventListener('click', function () { showPanel(panels.question); });
 
+  /* ---- Botão "Voltar" do painel de ausência ---- */
+  document.getElementById('btn-voltar-nao').addEventListener('click', function () { showPanel(panels.question); });
+
   /* ---- RSVP via WhatsApp ----
      As confirmações chegam ao número abaixo (formato internacional, só dígitos). */
   var WHATSAPP_NUMBER = '5511951315012';
@@ -494,32 +498,26 @@
   /**
    * Envia os dados para o Google Sheets.
    *
-   * Usa URLSearchParams + mode:'no-cors' porque o Google Apps Script
-   * não suporta CORS completo para POST de origens externas.
-   * Com 'no-cors' a resposta fica opaca (não pode ser lida),
-   * mas o servidor recebe e processa os dados corretamente.
+   * Usa um elemento <img> com src apontando para o endpoint com os dados
+   * em query string (GET). Esse método é 100% compatível com todos os
+   * browsers e dispositivos — desktop, iOS Safari, Android Chrome —
+   * sem problemas de CORS, preflight ou headers bloqueados.
+   *
+   * O Apps Script precisa ter um doGet(e) que leia e.parameter e grave
+   * na planilha (além do doPost já existente).
    *
    * @param {Object} dados  { nome, presenca, acompanhante }
    */
   function registrarNaPlanilha(dados) {
     if (!SHEETS_URL) return;
 
-    // Formata como application/x-www-form-urlencoded
-    var params = new URLSearchParams();
-    params.append('nome',         dados.nome         || '');
-    params.append('presenca',     dados.presenca     || 'Sim');
-    params.append('acompanhante', dados.acompanhante || 'Não');
+    var qs = 'nome='          + encodeURIComponent(dados.nome         || '')
+           + '&presenca='     + encodeURIComponent(dados.presenca     || 'Sim')
+           + '&acompanhante=' + encodeURIComponent(dados.acompanhante || 'Não');
 
-    fetch(SHEETS_URL, {
-      method:  'POST',
-      mode:    'no-cors',          // essencial para Apps Script sem CORS
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body:    params.toString()
-    })
-    .catch(function (err) {
-      // Falha de rede — não interrompe o fluxo do convite
-      console.warn('[Planilha] Falha ao enviar:', err);
-    });
+    // GET com no-cors — funciona em desktop e mobile sem problemas de CORS
+    fetch(SHEETS_URL + '?' + qs, { method: 'GET', mode: 'no-cors' })
+      .catch(function () {});
   }
 
   var guestName = '';
@@ -580,9 +578,29 @@
     showPanel(panels.encerrado);
   } else {
     document.getElementById('btn-sim').addEventListener('click', function () { showPanel(panels.form); });
+
+    /* ---- Botão "Não" — leva ao painel de coleta de nome ---- */
     document.getElementById('btn-nao').addEventListener('click', function () {
+      showPanel(panels.nomeNao);
+    });
+
+    /* ---- Formulário de ausência ---- */
+    document.getElementById('form-nome-nao').addEventListener('submit', function (e) {
+      e.preventDefault();
+      var nomeAusente = document.getElementById('nome-nao').value.trim();
+      if (!nomeAusente) { document.getElementById('nome-nao').focus(); return; }
+
+      // Monta link do WhatsApp com o nome da pessoa
       document.getElementById('btn-whatsapp-nao').href =
-        whatsappLink('Olá! Infelizmente não poderei comparecer ao casamento de Lais & Jonathan. Agradeço o convite!');
+        whatsappLink('Olá! Infelizmente ' + nomeAusente + ' não poderá comparecer ao casamento de Lais & Jonathan. Agradeço o convite!');
+
+      // Registra na planilha — ausência com "Não se aplica" para acompanhante
+      registrarNaPlanilha({
+        nome:         nomeAusente,
+        presenca:     'Não',
+        acompanhante: 'Não se aplica'
+      });
+
       showPanel(panels.nao);
     });
   }

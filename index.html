@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
@@ -120,6 +120,22 @@
         <p class="msg-acompanhante" id="msg-acompanhante" style="display:none;">Por gentileza chamar no WhatsApp para verificação junto aos noivos</p>
         <a class="btn btn-primary btn-wa" id="btn-whatsapp-sim" href="#" target="_blank" rel="noopener">Enviar confirmação por WhatsApp</a>
         <p class="result-names">Toque no botão para que sua confirmação chegue até nós.</p>
+      </div>
+
+      <!-- Painel: coleta o nome de quem não vai comparecer -->
+      <div id="panel-nome-nao" class="panel">
+        <p class="result-title">Que pena!</p>
+        <p class="form-sub">Para registrarmos sua ausência na lista, informe seu nome completo.</p>
+        <form id="form-nome-nao" novalidate>
+          <div class="field">
+            <label for="nome-nao">Seu nome completo</label>
+            <input type="text" id="nome-nao" name="nome-nao" autocomplete="name" required>
+          </div>
+          <div class="form-actions">
+            <button type="submit" class="btn btn-ghost">Registrar ausência</button>
+            <button type="button" class="back-link" id="btn-voltar-nao">Voltar</button>
+          </div>
+        </form>
       </div>
 
       <div id="panel-nao" class="panel">
